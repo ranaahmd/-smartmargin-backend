@@ -1,4 +1,7 @@
 from django.urls import path
 from .views import (
-    I
+    IngredientDeatailAPIView
 )
+urlpatterns =[
+    path('ingredients/',IngredientDeatailAPIView.as_view(),name="inredient-detail")
+]

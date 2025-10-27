@@ -44,3 +44,32 @@ class IngredientDeatailAPIView(APIView):
              return Response({"error:" :"Ingredent not found"},status=status.HTTP_404_NOT_FOUND)
         ingredient.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+class ProductDeatailAPIView (APIView):
+    permission_classes =[permissions.IsAuthenticated]
+    def get_object(self,id,user):
+        try:
+            return Product.objects.get(id=id,user=user)
+        except Product.DoesNotExist:
+            return None
+    def get(self,request,id):
+      Product = self.get_object(id,request.user)
+      if not Product:
+          return Response({"error:" :"Product not found"},status=status.HTTP_404_NOT_FOUND)
+      serializer = ProductSerializer(Product)
+      return Response(serializer.data)
+    def put (self,request,id):
+        Product = self.get_object(id,request.user)
+        if not Product:
+             return Response({"error:" :"Product not found"},status=status.HTTP_404_NOT_FOUND)
+        serializer = ProductSerializer(Product,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self,id,request):
+        Product = self.get_object(id,request.user)
+        if not Product:
+             return Response({"error:" :"Product not found"},status=status.HTTP_404_NOT_FOUND)
+        Product.delete()
+        
