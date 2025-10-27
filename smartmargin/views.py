@@ -15,3 +15,16 @@ class IngredientViewSet(APIView):
             serializer.save(user=request.user)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+class IngredientDeatailAPIView(APIView):
+    permission_classes =[permissions.IsAuthenticated]
+    def  get_object(self,id,user):
+        try:
+            return Ingredient.objects.get(id=id,user=user)
+        except Ingredient.DoesNotExist:
+            return None
+    def get(self,request,id):
+      ingredient = self.get_object(id,request.user)
+      if not ingredient:
+          return Response({"error:" :"Ingredent not found"},status=status.HTTP_404_NOT_FOUND)
+      serializer = IngredientSerializer(ingredient)
+      return Response(serializer.data)
