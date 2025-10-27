@@ -1,24 +1,17 @@
-from rest_framework import viewsets,permissions
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status,permissions
 from .models import Ingredient,Product,ProductIngredient,Note
 from .serializers import IngredientSerializer ,ProductSerializer,ProductIngredientSerializer,NoteSerializer
-class IngredientViewSet(viewsets.ModelViewSet):
-    queryset = Ingredient.objects.all()
-    serializer_class = IngredientSerializer
+class IngredientViewSet(APIView):
     permission_classes =[permissions.IsAuthenticated]
-    def get_queryset(self):
-        return Ingredient.objects.filter(user=self.request.user) 
-    def perform_create(self, serializer):
-       serializer.save(user=self.request.user)
-    
-class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes =[permissions.IsAuthenticated]
-    def get_queryset(self):
-        return Product.objects.filter(user=self.request.user)
-    def perform_create(self, serializer):
-         serializer.save(user=self.request.user)
-class ProductIngredientViewSet(viewsets.ModelViewSet):
-    queryset = ProductIngredient.objects.all()
-    serializer_class =ProductIngredientSerializer
-    permission_classes =[permissions.IsAuthenticated]
+    def get(self,request):
+        Ingredients = Ingredient.objects.filter(user=self.request.user) 
+        serializer= IngredientSerializer(Ingredients,many=True) 
+        return Response(serializer.data)
+    def post(self,request):
+        serializer = IngredientSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
