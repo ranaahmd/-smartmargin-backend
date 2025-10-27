@@ -6,8 +6,8 @@ from .serializers import IngredientSerializer ,ProductSerializer,ProductIngredie
 class IngredientListViewSet(APIView):
     permission_classes =[permissions.IsAuthenticated]
     def get(self,request):
-        Ingredients = Ingredient.objects.filter(user=self.request.user) 
-        serializer= IngredientSerializer(Ingredients,many=True) 
+        ingredients = Ingredient.objects.filter(user=self.request.user) 
+        serializer= IngredientSerializer(ingredients,many=True) 
         return Response(serializer.data)
     def post(self,request):
         serializer = IngredientSerializer(data=request.data)
