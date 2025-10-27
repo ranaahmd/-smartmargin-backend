@@ -28,3 +28,19 @@ class IngredientDeatailAPIView(APIView):
           return Response({"error:" :"Ingredent not found"},status=status.HTTP_404_NOT_FOUND)
       serializer = IngredientSerializer(ingredient)
       return Response(serializer.data)
+    def put (self,request,id):
+        ingredient = self.get_object(id,request.user)
+        if not ingredient:
+             return Response({"error:" :"Ingredent not found"},status=status.HTTP_404_NOT_FOUND)
+        serializer = IngredientSerializer(ingredient,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self,id,request):
+        ingredient = self.get_object(id,request.user)
+        if not ingredient:
+             return Response({"error:" :"Ingredent not found"},status=status.HTTP_404_NOT_FOUND)
+        ingredient.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
