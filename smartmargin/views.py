@@ -1,7 +1,12 @@
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import User
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import AllowAny
+from rest_framework.serializers import ModelSerializer
 from rest_framework.response import Response
-from rest_framework import status,permissions
-from .models import Ingredient,Product,ProductIngredient,Note
+from rest_framework import status,permissions,generics
+from .models import Ingredient,Product,ProductIngredient,Note,UserSerializer
 from .serializers import IngredientSerializer ,ProductSerializer,ProductIngredientSerializer,NoteSerializer
 class IngredientListViewSet(APIView):
     permission_classes =[permissions.IsAuthenticated]
@@ -126,3 +131,19 @@ class NoeDetailAPITView(APIView):
         if not Note:
              return Response({"error:" :"Note not found"},status=status.HTTP_404_NOT_FOUND)
         note.delete()
+ #copied from cat-collector
+class SignupUserView(APIView):
+    queryset = User.objects.all()
+    permission_classes = [permissions.AllowAny]
+    serializer_class = UserSerializer
+class LogoutView(APIView):
+     permission_classes = [permissions.AllowAny]
+     serializer_class = [JWTAuthentication]
+     def post (self,request):
+         try:
+             refresh_token = request.data["refresh"]
+             token = RefreshToken(refresh_token)
+             token.blacklist()
+             return Response({"message:":"Logout "},status=status.HTTP_205_RESET_CONTENT)
+         except Exception as e:
+             return Response ({"error:",str(e)}, status=status.HTTP_400_BAD_REQUEST)
