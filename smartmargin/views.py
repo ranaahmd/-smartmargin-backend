@@ -6,7 +6,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ModelSerializer
 from rest_framework.response import Response
 from rest_framework import status,permissions,generics
-from .models import Ingredient,Product,ProductIngredient,Note,UserSerializer
+from .models import Ingredient,Product,ProductIngredient,Note
+from .serializers import UserSerializer
 from .serializers import IngredientSerializer ,ProductSerializer,ProductIngredientSerializer,NoteSerializer
 class IngredientListViewSet(APIView):
     permission_classes =[permissions.IsAuthenticated]
