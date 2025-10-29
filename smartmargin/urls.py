@@ -4,10 +4,9 @@ from . import views
 from rest_framework_simplejwt.views import(
     TokenObtainPairView,
     TokenRefreshView,
+    
 )
-from .views import (
-    IngredientDeatailAPIView,IngredientListViewSet,ProductListAPIView,ProductDeatailAPIView,NoeDetailAPITView,NoteListCreateAPIView,SignupUserView,LogoutView
-)
+from .views import *
 urlpatterns =[
     path ('ingredients/',IngredientListViewSet.as_view(),name='Ingredients-list'),
     path ('ingredients/<int:id>/',IngredientDeatailAPIView.as_view(),name='Ingredients-detail'),
@@ -16,8 +15,8 @@ urlpatterns =[
     path('notes/',NoteListCreateAPIView.as_view(),name='note-list'),
     path('notes/<int:id>/',NoeDetailAPITView.as_view(),name='note-detail'),
     #copied from george
-    path('signup', views. SignupUserView.as_view(), name='signup'),
-    path('login/', TokenObtainPairView.as_view(), name='login'),
-    path('logout/', TokenObtainPairView.as_view(), name='logout'),
+    path('signup/', views.SignupUserView.as_view(), name='signup'),
+    path('login/', views.LoginView.as_view(), name='login'),
+    # path('api/logout/', views.LogoutView.as_view(), name='logout'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
