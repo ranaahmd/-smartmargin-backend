@@ -9,18 +9,20 @@ from rest_framework import status,permissions,generics
 from .models import Ingredient,Product,ProductIngredient,Note
 from .serializers import UserSerializer
 from .serializers import IngredientSerializer ,ProductSerializer,ProductIngredientSerializer,NoteSerializer
+
 class IngredientListViewSet(APIView):
     permission_classes =[permissions.IsAuthenticated]
     def get(self,request):
-        ingredients = Ingredient.objects.filter(user=self.request.user) 
-        serializer= IngredientSerializer(ingredients,many=True) 
+        ingredients = Ingredient.objects.filter(user=request.user) 
+        serializer= IngredientSerializer(ingredients,many=True, context={'request': request}) 
         return Response(serializer.data)
     def post(self,request):
-        serializer = IngredientSerializer(data=request.data)
+        serializer = IngredientSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
 class IngredientDeatailAPIView(APIView):
     permission_classes =[permissions.IsAuthenticated]
     def  get_object(self,id,user):
@@ -32,34 +34,35 @@ class IngredientDeatailAPIView(APIView):
       ingredient = self.get_object(id,request.user)
       if not ingredient:
           return Response({"error:" :"Ingredent not found"},status=status.HTTP_404_NOT_FOUND)
-      serializer = IngredientSerializer(ingredient)
+      serializer = IngredientSerializer(ingredient, context={'request': request})
       return Response(serializer.data)
     def put (self,request,id):
         ingredient = self.get_object(id,request.user)
         if not ingredient:
              return Response({"error:" :"Ingredent not found"},status=status.HTTP_404_NOT_FOUND)
-        serializer = IngredientSerializer(ingredient,data=request.data)
+        serializer = IngredientSerializer(ingredient,data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         
-    def delete(self,id,request):
+    def delete(self,request,id):
         ingredient = self.get_object(id,request.user)
         if not ingredient:
              return Response({"error:" :"Ingredent not found"},status=status.HTTP_404_NOT_FOUND)
         ingredient.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 class ProductListAPIView(APIView):
      permission_classes =[permissions.IsAuthenticated]
-     def get_object(self,request):
+     def get(self,request):
         products = Product.objects.filter(user=request.user)
-        serializer = ProductSerializer(products,many=True)
+        serializer = ProductSerializer(products,many=True, context={'request': request})
         return Response(serializer.data)
      def post (self,request):
-         serializer= ProductSerializer(data=request.data)
+         serializer= ProductSerializer(data=request.data, context={'request': request})
          if serializer.is_valid():
-             serializer.save(user=request.user)
+             serializer.save()
              return Response(serializer.data,status=status.HTTP_201_CREATED)
          return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
          
@@ -71,40 +74,42 @@ class ProductDeatailAPIView (APIView):
         except Product.DoesNotExist:
             return None
     def get(self,request,id):
-      Product = self.get_object(id,request.user)
-      if not Product:
+      product = self.get_object(id,request.user)
+      if not product:
           return Response({"error:" :"Product not found"},status=status.HTTP_404_NOT_FOUND)
-      serializer = ProductSerializer(Product)
+      serializer = ProductSerializer(product, context={'request': request})
       return Response(serializer.data)
     def put (self,request,id):
-        Product = self.get_object(id,request.user)
-        if not Product:
+        product = self.get_object(id,request.user)
+        if not product:
              return Response({"error:" :"Product not found"},status=status.HTTP_404_NOT_FOUND)
-        serializer = ProductSerializer(Product,data=request.data)
+        serializer = ProductSerializer(product,data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         
-    def delete(self,id,request):
-        Product = self.get_object(id,request.user)
-        if not Product:
+    def delete(self,request,id):
+        product = self.get_object(id,request.user)
+        if not product:
              return Response({"error:" :"Product not found"},status=status.HTTP_404_NOT_FOUND)
-        Product.delete()
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 class NoteListCreateAPIView(APIView):
      permission_classes =[permissions.IsAuthenticated]
-     def get_object(self,request):
+     def get(self,request):
         notes = Note.objects.filter(user=request.user)
-        serializer = NoteSerializer(notes,many=True)
+        serializer = NoteSerializer(notes,many=True, context={'request': request})
         return Response(serializer.data)
      def post (self,request):
-         serializer= NoteSerializer(data=request.data)
+         serializer= NoteSerializer(data=request.data, context={'request': request})
          if serializer.is_valid():
-             serializer.save(user=request.user)
+             serializer.save()
              return Response(serializer.data,status=status.HTTP_201_CREATED)
          return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
          
-class NoeDetailAPITView(APIView):
+class NoteDetailAPITView(APIView):
        permission_classes =[permissions.IsAuthenticated]
        def get_object(self,id,user):
         try:
@@ -115,29 +120,24 @@ class NoeDetailAPITView(APIView):
         note = self.get_object(id,request.user)
         if not note:
           return Response({"error:" :"Note not found"},status=status.HTTP_404_NOT_FOUND)
-        serializer = NoteSerializer(note)
+        serializer = NoteSerializer(note, context={'request': request})
         return Response(serializer.data)
        def put (self,request,id):
         note = self.get_object(id,request.user)
         if not note:
              return Response({"error:" :"Note not found"},status=status.HTTP_404_NOT_FOUND)
-        serializer = NoteSerializer(Note,data=request.data)
+        serializer = NoteSerializer(note,data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         
-       def delete(self,id,request):
+       def delete(self,request,id):
         note = self.get_object(id,request.user)
-        if not Note:
+        if not note:
              return Response({"error:" :"Note not found"},status=status.HTTP_404_NOT_FOUND)
         note.delete()
- #copied from cat-collector
-from rest_framework import status, permissions
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.contrib.auth.models import User
-from .serializers import UserSerializer
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class SignupUserView(APIView):
     permission_classes = [permissions.AllowAny]

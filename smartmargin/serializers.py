@@ -1,22 +1,34 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Ingredient,Product,ProductIngredient,Note
+from .models import Ingredient, Product, ProductIngredient, Note
+
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
-        model =Ingredient
+        model = Ingredient
         fields = '__all__'
+        read_only_fields = ['user']  
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        validated_data.pop('user', None)
+        return super().update(instance, validated_data)
+
 class ProductIngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductIngredient
-        fields ='__all__'
+        fields = '__all__'
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
-class NoteSerializer (serializers.ModelSerializer):
+
+class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
-        fields ='__all__'
+        fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
