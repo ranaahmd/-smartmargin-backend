@@ -139,7 +139,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+SIMPLE_JWT ={
+    'ACCESS_TOKEN_LIFETIME':
+    timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME':
+    timedelta(days=7)
+}
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
