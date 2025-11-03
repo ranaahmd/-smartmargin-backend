@@ -21,3 +21,8 @@ class Note (models.Model):
     content= models.TextField()
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
+class Dashboard(models.Model):
+     title = models.CharField(max_length=100)
+     content= models.TextField()
+     user = models.ForeignKey(User,on_delete=models.CASCADE)
+     created = models.DateTimeField(auto_now_add=True)

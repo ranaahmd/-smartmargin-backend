@@ -17,6 +17,5 @@ urlpatterns =[
     #copied from george
     path('signup/', views.SignupUserView.as_view(), name='signup'),
     path('login/', views.LoginView.as_view(), name='login'),
-    # path('api/logout/', views.LogoutView.as_view(), name='logout'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
