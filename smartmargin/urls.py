@@ -18,4 +18,5 @@ urlpatterns =[
     path('signup/', views.SignupUserView.as_view(), name='signup'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path ('dashborad/',DashboardAPIView.as_view(),name ='dashborad-profit')
 ]
