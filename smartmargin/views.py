@@ -6,9 +6,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ModelSerializer
 from rest_framework.response import Response
 from rest_framework import status,permissions,generics
-from .models import Ingredient,Product,ProductIngredient,Note
+from .models import Ingredient,Product,ProductIngredient,Note,Dashboard
 from .serializers import UserSerializer
-from .serializers import IngredientSerializer ,ProductSerializer,ProductIngredientSerializer,NoteSerializer
+from .serializers import IngredientSerializer ,ProductSerializer,ProductIngredientSerializer,NoteSerializer,DashboardSerializer
 
 class IngredientListViewSet(APIView):
     permission_classes =[permissions.IsAuthenticated]
@@ -65,7 +65,18 @@ class ProductListAPIView(APIView):
              serializer.save()
              return Response(serializer.data,status=status.HTTP_201_CREATED)
          return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-         
+class DashboardAPIView(APIView) :
+    permission_classes =[permissions.IsAuthenticated]
+    def get(self,request):
+        dashboards = Dashboard.objects.filter(user=request.user)
+        serializer = DashboardSerializer(dashboards,many=True, context={'request': request})
+        return Response(serializer.data)
+    def post (self,request):
+         serializer= DashboardSerializer(data=request.data, context={'request': request})
+         if serializer.is_valid():
+             serializer.save()
+             return Response(serializer.data,status=status.HTTP_201_CREATED)
+         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 class ProductDeatailAPIView (APIView):
     permission_classes =[permissions.IsAuthenticated]
     def get_object(self,id,user):
