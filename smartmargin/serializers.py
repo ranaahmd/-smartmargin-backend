@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Ingredient, Product, ProductIngredient, Note
+from .models import Ingredient, Product, ProductIngredient, Note,Dashboard
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,7 +24,10 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
-
+class DashboardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dashboard
+        fields ='__all__'
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
