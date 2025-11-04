@@ -53,18 +53,21 @@ class IngredientDeatailAPIView(APIView):
         ingredient.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class ProductListAPIView(APIView):
-     permission_classes =[permissions.IsAuthenticated]
-     def get(self,request):
+class ProductListCreateAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
         products = Product.objects.filter(user=request.user)
-        serializer = ProductSerializer(products,many=True, context={'request': request})
+        serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
-     def post (self,request):
-         serializer= ProductSerializer(data=request.data, context={'request': request})
-         if serializer.is_valid():
-             serializer.save()
-             return Response(serializer.data,status=status.HTTP_201_CREATED)
-         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request):
+        serializer = ProductSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()  
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class DashboardAPIView(APIView) :
     permission_classes =[permissions.IsAuthenticated]
     def get(self,request):
