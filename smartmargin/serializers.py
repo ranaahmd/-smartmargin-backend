@@ -25,12 +25,13 @@ class ProductIngredientSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    ingredients = ProductIngredientSerializer(many=True, write_only=True)
+    ingredients = ProductIngredientSerializer(many=True, write_only=True, required=False)
 
     class Meta:
         model = Product
         fields = '__all__'
         read_only_fields = ['user']
+
 
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients', [])

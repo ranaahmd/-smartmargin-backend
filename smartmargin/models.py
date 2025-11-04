@@ -30,13 +30,11 @@ class Product(models.Model):
         self.total_cost = total
         self.profit_amount = (self.total_cost * self.profit_percentage) / 100
         self.selling_price = self.total_cost + self.profit_amount
-
     def save(self, *args, **kwargs):
-        if not kwargs.get('update_fields'): 
-            self.calculate_costs()
-        super().save(*args, **kwargs)
-
-
+     super().save(*args, **kwargs)
+     if not kwargs.get('update_fields'):
+        self.calculate_costs()
+        super().save(update_fields=['total_cost', 'profit_amount', 'selling_price'])
 
 class ProductIngredient(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

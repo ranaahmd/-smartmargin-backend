@@ -62,11 +62,25 @@ class ProductListCreateAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = ProductSerializer(data=request.data, context={'request': request})
+        data = request.data.copy()
+        ingredients_data = data.pop('ingredients', [])
+
+        serializer = ProductSerializer(data=data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()  
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            product = serializer.save(user=request.user)
+            for ing in ingredients_data:
+             ProductIngredient.objects.create(
+                product=product,
+                ingredient_id=ing['ingredient'],
+                quantity=ing['quantity']
+            )
+             product.refresh_from_db()
+             product.calculate_costs()
+             product.save(update_fields=['total_cost', 'profit_amount', 'selling_price'])
+             result = ProductSerializer(product)
+             return Response(result.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class DashboardAPIView(APIView) :
     permission_classes =[permissions.IsAuthenticated]
@@ -80,35 +94,44 @@ class DashboardAPIView(APIView) :
              serializer.save()
              return Response(serializer.data,status=status.HTTP_201_CREATED)
          return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-class ProductDeatailAPIView (APIView):
-    permission_classes =[permissions.IsAuthenticated]
-    def get_object(self,id,user):
+class ProductDeatailAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self, id, user):
         try:
-            return Product.objects.get(id=id,user=user)
+            return Product.objects.get(id=id, user=user)
         except Product.DoesNotExist:
             return None
-    def get(self,request,id):
-      product = self.get_object(id,request.user)
-      if not product:
-          return Response({"error:" :"Product not found"},status=status.HTTP_404_NOT_FOUND)
-      serializer = ProductSerializer(product, context={'request': request})
-      return Response(serializer.data)
-    def put (self,request,id):
-        product = self.get_object(id,request.user)
+
+    def put(self, request, id):
+        product = self.get_object(id, request.user)
         if not product:
-             return Response({"error:" :"Product not found"},status=status.HTTP_404_NOT_FOUND)
-        serializer = ProductSerializer(product,data=request.data, context={'request': request})
+            return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data.copy()
+        ingredients_data = data.pop('ingredients', [])
+
+        serializer = ProductSerializer(product, data=data, context={'request': request}, partial=True)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-        
-    def delete(self,request,id):
-        product = self.get_object(id,request.user)
-        if not product:
-             return Response({"error:" :"Product not found"},status=status.HTTP_404_NOT_FOUND)
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            updated_product = serializer.save()
+
+            updated_product.productingredient_set.all().delete()
+            for ing in ingredients_data:
+                ProductIngredient.objects.create(
+                    product=updated_product,
+                    ingredient_id=ing['ingredient'],
+                    quantity=ing['quantity']
+                )
+
+            updated_product.refresh_from_db()
+            updated_product.calculate_costs()
+            updated_product.save(update_fields=['total_cost', 'profit_amount', 'selling_price'])
+
+            result = ProductSerializer(updated_product)
+            return Response(result.data)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class NoteListCreateAPIView(APIView):
      permission_classes =[permissions.IsAuthenticated]
