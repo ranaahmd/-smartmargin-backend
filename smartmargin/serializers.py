@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Ingredient, Product, ProductIngredient, Note, Dashboard
+from .models import Ingredient, Product, ProductIngredient, Note
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -56,13 +56,6 @@ class ProductSerializer(serializers.ModelSerializer):
         instance.calculate_costs()
         instance.save(update_fields=['total_cost', 'profit_amount', 'selling_price'])
         return instance
-
-
-
-class DashboardSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Dashboard
-        fields = '__all__'
 
 class NoteSerializer(serializers.ModelSerializer):
     class Meta:
