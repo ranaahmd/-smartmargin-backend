@@ -26,7 +26,7 @@ SmartMargin is a full-stack web application designed to help users manage their 
 ---
 
 ## ERD Diagram
-
+https://github.com/ranaahmd/-smartmargin-backend/commit/8fe3db66ce97539ebcf3652f2d5e1bc019e41923#diff-27f6aaa225fbb53364b10d5a11e6f43e7e06f1386d15329e910786164ef21180
 
 ---
 
